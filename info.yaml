@@ -11,35 +11,36 @@ project:
   tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
-  top_module:  "tt_um_example"
+  top_module:  "tt_um_gcd_stephan"
 
   # List your project's source files here.
   # Source files must be in ./src and you must list each source file separately, one per line.
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
-    - "project.v"
+    - "tt_um_gcd_stephan.v"
+    - "debounce.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: ""
-  ui[1]: ""
-  ui[2]: ""
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: ""
+  ui[0]: "AB0"
+  ui[1]: "AB1"
+  ui[2]: "AB2"
+  ui[3]: "AB3"
+  ui[4]: "AB4"
+  ui[5]: "AB5"
+  ui[6]: "AB6"
+  ui[7]: "AB7"
 
   # Outputs
-  uo[0]: ""
-  uo[1]: ""
-  uo[2]: ""
-  uo[3]: ""
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  uo[0]: "C0"
+  uo[1]: "C1"
+  uo[2]: "C2"
+  uo[3]: "C3"
+  uo[4]: "C4"
+  uo[5]: "C5"
+  uo[6]: "C6"
+  uo[7]: "C7"
 
   # Bidirectional pins
   uio[0]: ""

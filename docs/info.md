@@ -9,12 +9,17 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-Explain how your project works
+The project doesn't work yet.
+The goal is to give clock in two integers and the device will return the greatest common divisor
 
 ## How to test
 
-Explain how to use your project
+Configure integer.
+Clock it in.
+Configure next integer.
+Clock it in.
+Clock result out.
 
 ## External hardware
 
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+Buttons and LEDs.
