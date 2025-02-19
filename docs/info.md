@@ -9,8 +9,11 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
-The project doesn't work yet.
-The goal is to give clock in two integers and the device will return the greatest common divisor
+This project is a Greatest Common Divisor module.
+Hand it two integers and it will calculate the GCD and output it.
+
+Based on the GCD assignment from DTU Course 02203 Design Of Digital Systems.
+The Authors solution for the assignment, initially in VHDL is recreated in Verilog.
 
 ## How to test
 
