@@ -18,6 +18,7 @@ project:
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
     - "tt_um_gcd_stephan.v"
+    - "gcd_module.v"
     - "alu.v"
     - "buff.v"
     - "datapath.v"
