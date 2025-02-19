@@ -33,7 +33,7 @@ module fsm (
     always @(posedge clk or posedge reset)
     begin
         if (reset)
-            state = 2'b00;
+            state = 2'b000;
         else
             state = next_state;
     end

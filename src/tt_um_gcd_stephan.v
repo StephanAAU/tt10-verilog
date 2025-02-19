@@ -13,11 +13,11 @@ module tt_um_gcd_stephan (
     );
 
     wire [15:0] AB;
-    wire [15:0] C;
+    wire [6:0] C;
     wire req;
     wire ack;
     reg rst;
-    wire imNothing = 0;
+    wire imNothing = 8'b0;
 
     assign AB = {imNothing, uio_in[6:0], ui_in};
     assign req = ui_in[7];
@@ -25,12 +25,13 @@ module tt_um_gcd_stephan (
     assign uo_out[6:0] = C[6:0];
     assign uo_out[7] = ack;
 
+    assign uio_out = imNothing;
     
     always @ * begin
-        uio_oe <= imNothing;
+        uio_oe = imNothing;
     end
 
-    assign rst = ~rst_n;
+    assign rst = ~rst_n | ~ena;
 
     gcd_module gcd_module_inst (
         .reset(rst),

@@ -50,7 +50,8 @@ module datapath #(parameter W = 16)
         .A({1'b0, RegA_int}),
         .B({1'b0, RegB_int}),
         .fn(FN),
-        .C(Y),
+        .C[17](1'b0),
+        .C[16:0](Y),
         .Z(Z),
         .N(N)
     );
