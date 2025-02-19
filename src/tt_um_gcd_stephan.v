@@ -9,7 +9,7 @@ module tt_um_gcd_stephan (
     input wire [7:0] uio_in,
     output wire [7:0] uo_out,
     output wire [7:0] uio_out,
-    output wire [7:0] uio_oe
+    output reg [7:0] uio_oe
     );
 
     wire [15:0] AB;
