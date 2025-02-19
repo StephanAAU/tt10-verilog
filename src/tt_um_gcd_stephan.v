@@ -24,7 +24,7 @@ module tt_um_gcd_stephan (
     assign uo_out[6:0] = C;
     assign uo_out[7] = ack;
 
-    assign uio_oe = 8b'0;
+    assign uio_oe[7:0] = 8b'000000000;
 
     assign rst = ~rst_n;
 
