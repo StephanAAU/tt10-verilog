@@ -17,14 +17,15 @@ module tt_um_gcd_stephan (
     wire req;
     wire ack;
     reg rst;
+    wire imNothing = 0;
 
-    assign AB = {1b'0, uio_in[6:0], ui_in};
+    assign AB = {imNothing, uio_in[6:0], ui_in};
     assign req = ui_in[7];
     assign ack = uio_in[7];
     assign uo_out[6:0] = C[6:0];
     assign uo_out[7] = ack;
 
-    wire imNothing = 0;
+    
     always @ * begin
         uio_oe <= imNothing;
     end
