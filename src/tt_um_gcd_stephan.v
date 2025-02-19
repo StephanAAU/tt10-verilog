@@ -1,54 +1,39 @@
-// Lab 3 exercise
-// Greatest common divisor (GCD) computation
+// Wrapper for GCD module
 
-`default_nettype none
+module tt_um_gcd_stephan (
+    input wire clk,
+    input wire rst_n,
+    input wire ena,
 
-module tt_um_gcd_stephan
-    (
-        input wire        reset,
-        input wire        clk,
-
-        input wire        req,
-        input wire [15:0] AB,
-
-        output wire        ack,
-        output wire [15:0] C
+    input wire [7:0] ui_in,
+    input wire [7:0] uio_in,
+    output wire [7:0] uo_out,
+    output wire [7:0] uio_out,
+    output wire [7:0] uio_oe
     );
 
-    wire        ABorALU_int, LDA_int, LDB_int, N_int, Z_int;
-    wire [1:0]  FN_int;
+    wire [15:0] AB;
+    wire [15:0] C;
+    wire req;
+    wire ack;
+    reg rst;
 
-    fsm fsm_comp (
+    assign AB = {uio_in[6:0], ui_in};
+    assign req = ui_in[7];
+    assign ack = uio_in[7];
+    assign uo_out[6:0] = C;
+    assign uo_out[7] = ack;
+
+    assign uio_oe = 8b'0;
+
+    assign rst = ~rst_n;
+
+    gcd_module gcd_module_inst (
+        .reset(rst),
         .clk(clk),
-        .reset(reset),
-        
         .req(req),
-        .ack(ack),
-
-        .ABorALU(ABorALU_int),
-        .LDA(LDA_int),
-        .LDB(LDB_int),
-        .N(N_int),
-        .Z(Z_int),
-
-        .FN(FN_int)
-    );
-
-    datapath datapath_comp (
-        .clk(clk),
-        .reset(reset),
-
         .AB(AB),
-        .C(C),
-
-        .ABorALU(ABorALU_int),
-        .LDA(LDA_int),
-        .LDB(LDB_int),
-
-        .N(N_int),
-        .Z(Z_int),
-        
-        .FN(FN_int)
+        .ack(ack),
+        .C(C)
     );
-
 endmodule

@@ -45,7 +45,7 @@ pinout:
   uo[4]: "C[4]"
   uo[5]: "C[5]"
   uo[6]: "C[6]"
-  uo[7]: "C[7]"
+  uo[7]: "ack"
 
   # Bidirectional pins
   uio[0]: "AB[8]"
@@ -55,7 +55,7 @@ pinout:
   uio[4]: "AB[12]"
   uio[5]: "AB[13]"
   uio[6]: "AB[14]"
-  uio[7]: "AB[15]"
+  uio[7]: "req"
 
 # Do not change!
 yaml_version: 6
