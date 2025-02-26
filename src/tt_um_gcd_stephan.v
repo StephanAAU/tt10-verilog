@@ -13,31 +13,33 @@ module tt_um_gcd_stephan (
     );
 
     wire [15:0] AB;
-    wire [6:0] C;
-    wire req;
-    wire ack;
+    /* verilator lint_off UNUSEDSIGNAL */
+    reg [15:0] C; 
+    /* verilator lint_on UNUSEDSIGNAL */
+    wire req_w;
+    wire ack_w;
     reg rst;
-    wire imNothing = 8'b0;
+    wire zero_bit_wire = 1'b0;
 
-    assign AB = {imNothing, uio_in[6:0], ui_in};
-    assign req = ui_in[7];
-    assign ack = uio_in[7];
+    assign AB = {zero_bit_wire, uio_in[6:0], ui_in[7:0]};
+    assign req_w = uio_in[7];
+
     assign uo_out[6:0] = C[6:0];
-    assign uo_out[7] = ack;
-
-    assign uio_out = imNothing;
+    assign uo_out[7] = ack_w;
     
-    always @ * begin
-    end
+    assign uio_oe = 8'b0; //{zero_bit_wire, zero_bit_wire, zero_bit_wire, zero_bit_wire, zero_bit_wire, zero_bit_wire, zero_bit_wire, zero_bit_wire};
+    assign uio_out = 8'b0; //{zero_bit_wire, zero_bit_wire, zero_bit_wire, zero_bit_wire, zero_bit_wire, zero_bit_wire, zero_bit_wire, zero_bit_wire};
 
-    assign rst = ~rst_n | ~ena;
+    assign rst = ~rst_n;
+
+    wire _unused = &{ena, 1'b0};
 
     gcd_module gcd_module_inst (
         .reset(rst),
         .clk(clk),
-        .req(req),
+        .req(req_w),
         .AB(AB),
-        .ack(ack),
+        .ack(ack_w),
         .C(C)
     );
 endmodule

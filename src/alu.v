@@ -28,7 +28,7 @@ module alu #(parameter W = 16)
     end;
 
     always @(*) begin
-        if (C) begin
+        if (C != 0) begin
             Z = 0;
         end
         else 

@@ -26,16 +26,15 @@ module fsm (
               calc      = 4,
               calc_done = 5,
               sub_ba    = 6,
-              sub_ab    = 7,
-              store_reg = 8;
+              sub_ab    = 7;
 
     // Registers for the state machine
     always @(posedge clk or posedge reset)
     begin
         if (reset)
-            state = 2'b000;
+            state <= 3'b000;
         else
-            state = next_state;
+            state <= next_state;
     end
 
     // State machine logic

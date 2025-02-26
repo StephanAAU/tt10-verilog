@@ -36,7 +36,7 @@ module gcd_module
 
     datapath datapath_comp (
         .clk(clk),
-        .reset(reset),
+//        .reset(reset),
 
         .AB(AB),
         .C(C),
