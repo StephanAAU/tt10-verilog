@@ -12,12 +12,16 @@ module alu #(parameter W = 16)
         input wire  [W-1:0] A,
         input wire  [W-1:0] B,
         input wire  [1:0] fn,
+        input wire  rst,
         output reg [W-1:0] C,
         output reg Z,
         output reg N
     );
 
     always @(*) begin
+        if (rst == 1) begin
+            C = 0;
+        end else begin
         case (fn)
             2'b00: C = A - B;
             2'b01: C = B - A;
@@ -25,24 +29,29 @@ module alu #(parameter W = 16)
             2'b11: C = B;
             default: C = 0;
         endcase
+        end
     end;
 
     always @(*) begin
-        if (C != 0) begin
+        if (rst) begin
             Z = 0;
         end
-        else 
-        begin
-            Z = 1;
+        else if (C != 0) begin
+            Z = 0;
         end
-            
+        else begin
+            Z = 1;
+        end 
     end;
+
     always @(*) begin
-        if (C[W-1] == 1) begin
+        if (rst) begin
+            N = 0;
+        end
+        else if (C[W-1] == 1) begin
             N = 1;
         end
-        else
-        begin
+        else begin
             N = 0;
         end
     end

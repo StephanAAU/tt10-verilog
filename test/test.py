@@ -12,6 +12,7 @@ async def wait_for_bit7_rising(dut):
     while True:
         await Edge(dut.uo_out)  # Wait for any change on uo_out
         if dut.uo_out.value.is_resolvable:
+            dut._log.info(f"ACK triggered: dut.uo_out: {dut.uo_out.value}")
             if dut.uo_out.value & 0b10000000:  # Check if MSB is high
                 break
 
@@ -21,6 +22,7 @@ async def wait_for_bit7_falling(dut):
     while True:
         await Edge(dut.uo_out)  # Wait for any change on uo_out
         if dut.uo_out.value.is_resolvable:
+            dut._log.info(f"ACK triggered: dut.uo_out: {dut.uo_out.value}")
             if not (dut.uo_out.value & 0b10000000):  # Check if MSB is low
                 break
 
@@ -48,7 +50,7 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    await ClockCycles(dut.clk, 2)
+    await ClockCycles(dut.clk, 5)
 
     dut._log.info("Testing different inputs")
 
@@ -58,19 +60,22 @@ async def test_project(dut):
         bin_a = "{:016b}".format(A_OPS_input[i])
         bin_b = "{:016b}".format(B_OPS_input[i])
 
-        # Set req high
-        dut._log.info("Set req high")
-        dut.uio_in[7].value = 1
-
         # Assign "A" bit vectors to input pins
+        dut._log.info("Input A vector")
         for j in range(8):
             dut.ui_in[j].value = int(bin_a[-1-j])
 
         for j in range(7):
             dut.uio_in[j].value = int(bin_a[-9-j])
 
+        # Set req high
+        await ClockCycles(dut.clk, 2)
+        dut._log.info("Set req high")
+        dut.uio_in[7].value = 1
+
         # Wait for ack
         await wait_for_bit7_rising(dut)
+        await ClockCycles(dut.clk, 2)
 
         # Set req low
         dut._log.info("Set req low")
@@ -78,23 +83,24 @@ async def test_project(dut):
 
         # Wait for ack
         await wait_for_bit7_falling(dut)
-
-        # Set req high
-        dut._log.info("Set req high")
-        dut.uio_in[7].value = 1
+        await ClockCycles(dut.clk, 2)
 
         # Assign "B" bit vectors to input pints
+        dut._log.info("Input B vector")
         for j in range(8):
             dut.ui_in[j].value = int(bin_b[-1-j])
 
         for j in range(7):
             dut.uio_in[j].value = int(bin_b[-9-j])
         
+        # Set req high
+        await ClockCycles(dut.clk, 2)
+        dut._log.info("Set req high")
+        dut.uio_in[7].value = 1
+
         # Wait for ack
         await wait_for_bit7_rising(dut)
-
-        # Wait another clock
-        await ClockCycles(dut.clk, 1)
+        await ClockCycles(dut.clk, 2)
 
         # Extract 7 LSB bits, since 8th is ack
         test = dut.uo_out.value & 0b01111111
@@ -107,7 +113,8 @@ async def test_project(dut):
         dut.uio_in[7].value = 0
 
         # wait for ack
-        await wait_for_bit7_falling(dut)        
+        await wait_for_bit7_falling(dut)
+        await ClockCycles(dut.clk, 2)
 
 
     # If we reach here the test was good...

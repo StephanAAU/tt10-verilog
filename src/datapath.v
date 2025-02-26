@@ -3,7 +3,7 @@
 module datapath #(parameter W = 16)
     (
     input wire clk,
-    //input wire reset,
+    input wire reset,
 
     input  wire [15:0] AB,
     output wire [15:0] C,
@@ -19,10 +19,9 @@ module datapath #(parameter W = 16)
     );
 
     wire [W-1:0] C_int, RegA_int, RegB_int;
-    /* verilator lint_off UNUSEDSIGNAL */
     wire [W:0] Y; 
-    /* verilator lint_on UNUSEDSIGNAL */
 
+    wire unused_bit = Y[W:W];
 
     buff #(.N(W)) output_buffer (
         .data_in(C_int), 
@@ -39,6 +38,7 @@ module datapath #(parameter W = 16)
     regi #(.N(W)) regA (
         .clk(clk),
         .en(LDA),
+        .rst(reset),
         .data_in(C_int),
         .data_out(RegA_int)
     );
@@ -46,6 +46,7 @@ module datapath #(parameter W = 16)
     regi #(.N(W)) regB (
         .clk(clk),
         .en(LDB),
+        .rst(reset),
         .data_in(C_int),
         .data_out(RegB_int)
     );
@@ -54,6 +55,7 @@ module datapath #(parameter W = 16)
         .A({1'b0, RegA_int}),
         .B({1'b0, RegB_int}),
         .fn(FN),
+        .rst(reset),
         .C(Y),
         .Z(Z),
         .N(N)

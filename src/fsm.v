@@ -31,7 +31,7 @@ module fsm (
     // Registers for the state machine
     always @(posedge clk or posedge reset)
     begin
-        if (reset)
+        if (reset == 1)
             state <= 3'b000;
         else
             state <= next_state;
@@ -41,27 +41,37 @@ module fsm (
     always @(*) 
     begin
         case (state) 
-
         ready_a: begin
-            FN  = 2'b10;
-            ack = 0;
+            FN         = 2'b10;
+            LDA        = 0;
+            LDB        = 0;
+            ABorALU    = 0;
+            ack        = 0;
+            next_state = ready_a;
 
             if (req == 1)
                 next_state = load_a;
         end
+
         load_a: begin
             FN          = 2'b10;
             ABorALU     = 1;
             LDA         = 1;
+            LDB         = 0;
             ack         = 1;
+            next_state  = load_a;
 
             if (req == 1'b0)
                 next_state = ready_b;
         end
+
         ready_b: begin
+            FN          = 2'b10;
             ABorALU     = 0;
             LDA         = 0;
+            LDB         = 0;
             ack         = 0;
+            next_state  = ready_b;
 
             if (req == 1'b1)
                 next_state = load_b;
@@ -70,7 +80,10 @@ module fsm (
         load_b: begin
             FN          = 2'b11;
             ABorALU     = 1;
+            LDA         = 0;
             LDB         = 1;
+            ack         = 0;
+            next_state = load_b;
 
             if (req == 1'b1)
                 next_state = calc;
@@ -81,6 +94,8 @@ module fsm (
             ABorALU     = 0;
             LDA         = 0;
             LDB         = 0;
+            ack         = 0;
+            next_state  = calc;
 
             if (Z == 1)
                 next_state = calc_done;
@@ -92,27 +107,44 @@ module fsm (
 
         calc_done: begin
             FN          = 2'b10;
+            ABorALU     = 0;
+            LDA         = 0;
+            LDB         = 0;
             ack         = 1;
+            next_state  = calc_done;
+
             if (req == 0)
                 next_state = ready_a;
         end
 
         sub_ba: begin
             FN          = 2'b01;
+            ABorALU     = 0;
+            LDA         = 0;
             LDB         = 1;
+            ack         = 0;
             
             next_state  = calc;
         end
 
         sub_ab: begin
             FN          = 2'b00;
+            ABorALU     = 0;
             LDA         = 1;
+            LDB         = 0;
+            ack         = 0;
 
             next_state = calc;
         end
 
-        default:
+        default: begin
             next_state = ready_a;
+            FN         = 2'b00;
+            LDA        = 0;
+            LDB        = 0;
+            ABorALU    = 0;
+            ack        = 0;
+        end
 
         endcase
     end
