@@ -3,12 +3,37 @@
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import ClockCycles
+import cocotb.result
+from cocotb.triggers import ClockCycles, RisingEdge, FallingEdge, Edge
+
+# Helper functions to allow waiting for ack signal going high
+async def wait_for_bit7_rising(dut):
+    dut._log.info("Wait for ACK rising")
+    while True:
+        await Edge(dut.uo_out)  # Wait for any change on uo_out
+        if dut.uo_out.value.is_resolvable:
+            if dut.uo_out.value & 0b10000000:  # Check if MSB is high
+                break
+
+# Helper functions to allow waiting for ack signal going low
+async def wait_for_bit7_falling(dut):
+    dut._log.info("Wait for ACK falling")
+    while True:
+        await Edge(dut.uo_out)  # Wait for any change on uo_out
+        if dut.uo_out.value.is_resolvable:
+            if not (dut.uo_out.value & 0b10000000):  # Check if MSB is low
+                break
 
 
 @cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
+
+    dut._log.info(f"Cocotb version: {cocotb.__version__}")
+
+    A_OPS_input  = [26309, 17095, 2236, 16728,  8033,  5778, 1686, 26657, 21660, 7762, 31634,  8881, 17116, 28926, 10037, 24995, 20284, 28575, 16215, 13010,  1702, 10634, 12411,   745]
+    B_OPS_input  = [ 6586, 32320, 1636, 18369, 21398, 26058, 7344, 10113, 25684, 1859, 17864, 11586, 19418, 13729, 25711, 14695,  4879, 14561, 23167,  9066, 10994, 10593, 10704, 14882]
+    C_RES_output = [     1,    5,    4,     3,     1,     6,    6,     1,     4,    1,     2,     1,     2,     1,     1,     5,     1,     1,     1,     2,    46,     1,     3,     1]
 
     # Set the clock period to 10 us (100 KHz)
     clock = Clock(dut.clk, 10, units="us")
@@ -23,19 +48,68 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    dut._log.info("Test project behavior")
+    await ClockCycles(dut.clk, 2)
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    dut._log.info("Testing different inputs")
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    for i in range(len(A_OPS_input)):
+        dut._log.info(f"Itr {i}")
+        # Generate test signals as bit vectors
+        bin_a = "{:016b}".format(A_OPS_input[i])
+        bin_b = "{:016b}".format(B_OPS_input[i])
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    #assert dut.uo_out.value == 50
-    assert True
+        # Set req high
+        dut._log.info("Set req high")
+        dut.uio_in[7].value = 1
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+        # Assign "A" bit vectors to input pins
+        for j in range(8):
+            dut.ui_in[j].value = int(bin_a[-1-j])
+
+        for j in range(7):
+            dut.uio_in[j].value = int(bin_a[-9-j])
+
+        # Wait for ack
+        await wait_for_bit7_rising(dut)
+
+        # Set req low
+        dut._log.info("Set req low")
+        dut.uio_in[7].value = 0
+
+        # Wait for ack
+        await wait_for_bit7_falling(dut)
+
+        # Set req high
+        dut._log.info("Set req high")
+        dut.uio_in[7].value = 1
+
+        # Assign "B" bit vectors to input pints
+        for j in range(8):
+            dut.ui_in[j].value = int(bin_b[-1-j])
+
+        for j in range(7):
+            dut.uio_in[j].value = int(bin_b[-9-j])
+        
+        # Wait for ack
+        await wait_for_bit7_rising(dut)
+
+        # Wait another clock
+        await ClockCycles(dut.clk, 1)
+
+        # Extract 7 LSB bits, since 8th is ack
+        test = dut.uo_out.value & 0b01111111
+        dut._log.info(f"dut.uo_out: {dut.uo_out.value}")
+
+        # Stop on error
+        assert test == C_RES_output[i]
+
+        # Set req low
+        dut.uio_in[7].value = 0
+
+        # wait for ack
+        await wait_for_bit7_falling(dut)        
+
+
+    # If we reach here the test was good...
+    cocotb.result.TestSuccess("Test passed")
+
